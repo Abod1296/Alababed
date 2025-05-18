@@ -1,52 +1,45 @@
 import streamlit as st
+from urllib.parse import quote
 
-# إعدادات الصفحة
-st.set_page_config(page_title="متجر العبابيد", page_icon="🧾", layout="centered")
+st.set_page_config(page_title="متجر العبابيد", layout="centered")
 
-# ترويسة مخصصة
-st.markdown(
-    """
-    <div style='text-align: center; margin-top: -50px;'>
-        <h5 style='color: black;'>مرحباً بك في</h5>
-        <h1 style='color: orange; font-family: "Arial Black", "Cairo", sans-serif;'>العبابيد</h1>
-        <h4 style='color: grey;'>هدفنا ثقتكم</h4>
-        <p style='color: #555;'>للتواصل: +963943001296</p>
-        <div style='margin-top: 10px; padding: 5px 10px; background-color: #fca311; display: inline-block; border-radius: 5px; color: white; font-weight: bold;'>أقساطنا راحتكم</div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# ترويسة منسقة
+st.markdown("""
+    <h4 style='text-align: center; color: black;'>مرحباً بك في</h4>
+    <h1 style='text-align: center; color: orange; font-family: "Cairo", sans-serif;'>العبابيد</h1>
+    <p style='text-align: center; color: gray;'>هدفنا ثقتكم</p>
+""", unsafe_allow_html=True)
 
-# اختيار التصنيف
-category = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مفروشات", "مواد بناء", "أخرى"])
-
-# اسم المنتج وسعره
+# إدخال البيانات
+category = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مواد بناء", "أخرى"])
 product_name = st.text_input("اسم المنتج")
 cash_price = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=10.0)
 
 if st.button("احسب الأقساط"):
     if product_name and cash_price > 0:
-        # الحسابات
-        increased_price = int(cash_price * 1.3)
-        min_down = int(increased_price * 0.25)
-        max_down = int(increased_price * 0.34)
-        recommended_down = (min_down + max_down) // 2
-        monthly_installment = (increased_price - recommended_down) // 5
+        increased_price = int(cash_price * 1.30)
+        down_payment = round(increased_price / 3)  # تقريب الرقم الصحيح
+        monthly_payment = round((increased_price - down_payment) / 5)
 
-        # عرض النتائج بتنسيق جميل
-        st.markdown(
-            f"""
-            <div style='background-color: #fca311; padding: 20px; border-radius: 10px; color: white; font-size: 18px;'>
-                <b>اسم المنتج:</b> {product_name}<br>
-                <b>التصنيف:</b> {category}<br>
-                <b>السعر كاش:</b> {int(cash_price)} دولار<br>
-                <b>السعر بعد الزيادة:</b> {increased_price} دولار<br>
-                <b>الدفعة الأولى:</b> {recommended_down} دولار<br>
-                <b>عدد الأقساط:</b> 5 دفعات<br>
-                <b>قيمة كل دفعة:</b> {monthly_installment} دولار
+        # عرض التقرير بشكل منسق وجميل
+        report = f"""
+        اسم المنتج: {product_name}
+        التصنيف: {category}
+        السعر بعد الزيادة: {increased_price} دولار
+        الدفعة الأولى (ثلث تقريباً): {down_payment} دولار
+        عدد الأقساط: 5 دفعات × {monthly_payment} دولار
+        """
+
+        st.markdown("""
+            <div style='background-color: orange; padding: 15px; border-radius: 10px; color: white; font-size: 16px;'>
+            <strong>تفاصيل الأقساط:</strong><br><br>
+            {}
+            <p style='text-align: center; margin-top: 10px; font-weight: bold;'>أقساطنا راحتكم</p>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
+        """.format(report.replace("\n", "<br>")), unsafe_allow_html=True)
+
+        # رابط المشاركة
+        share_link = f"https://wa.me/?text={quote('تفاصيل المنتج:\n' + report)}"
+        st.markdown(f"<a href='{share_link}' target='_blank'><button>مشاركة عبر واتساب</button></a>", unsafe_allow_html=True)
     else:
         st.warning("يرجى إدخال اسم المنتج وسعر الكاش.")
