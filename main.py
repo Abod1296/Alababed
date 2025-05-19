@@ -1,47 +1,51 @@
 import streamlit as st
 
-# تنسيق العنوان الرئيسي
-st.markdown("""
-    <h3 style='text-align: center; color: black;'>مرحباً بك في</h3>
-    <h1 style='text-align: center; color: orange; font-family: "Courier New", monospace;'>العبابيد</h1>
-    <h4 style='text-align: center; color: gray;'>هدفنا ثقتكم</h4>
-""", unsafe_allow_html=True)
+# إعداد الصفحة
+st.set_page_config(page_title="متجر العبابيد", layout="centered")
+
+# العنوان والترويسة
+st.markdown("<h3 style='text-align: center; color: black;'>مرحباً بك في</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: orange; font-family: Cairo;'>العبـــابيد</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray;'>هدفنا ثقتكم</p>", unsafe_allow_html=True)
+
+st.markdown("---")
 
 # ملصق جانبي
-st.markdown("<div style='text-align: center; color: orange; font-weight: bold;'>أقساطنا راحتكم</div>", unsafe_allow_html=True)
+st.sidebar.markdown("<h4 style='color: orange;'>أقساطنا راحتكم</h4>", unsafe_allow_html=True)
+st.sidebar.markdown("رقم التواصل: +963943001296")
 
-# نموذج الإدخال
-تصنيفات = ["أجهزة محمولة", "أجهزة كهربائية", "مواد بناء", "مفروشات", "أخرى"]
-نوع_المنتج = st.selectbox("اختر تصنيف المنتج", تصنيفات)
-اسم_المنتج = st.text_input("اسم المنتج")
-سعر_الكاش = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, format="%.2f")
+# إدخال المعلومات
+st.markdown("### اختر تصنيف المنتج")
+category = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مواد بناء", "أخرى"])
 
-# زر لحساب الأقساط
-if st.button("احسب كسامك") and اسم_المنتج and سعر_الكاش > 0:
-    السعر_بعد_الزيادة = round(سعر_الكاش * 1.3)
-    
-    الدفعة_الأولى_ثلث = السعر_بعد_الزيادة // 3
-    الدفعة_الأولى_ربع = السعر_بعد_الزيادة // 4
-    
-    الدفعة_الأولى = max(الدفعة_الأولى_ربع, الدفعة_الأولى_ثلث)
-    المتبقي = السعر_بعد_الزيادة - الدفعة_الأولى
-    عدد_الأشهر = 5
-    القسط_الشهري = round(المتبقي / عدد_الأشهر)
+product_name = st.text_input("اسم المنتج")
+cash_price = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=0.5, format="%.2f")
 
-    st.markdown("### تفاصيل الأقساط الشرعية:")
-    st.markdown(f"""
-    <div style='background-color: orange; padding: 15px; border-radius: 10px; color: white; font-size: 18px;'>
-    <strong>المنتج:</strong> {اسم_المنتج}<br>
-    <strong>التصنيف:</strong> {نوع_المنتج}<br>
-    <strong>السعر كاش:</strong> {سعر_الكاش}$<br>
-    <strong>السعر بعد الزيادة:</strong> {السعر_بعد_الزيادة}$<br>
-    <strong>الدفعة الأولى:</strong> {الدفعة_الأولى}$<br>
-    <strong>عدد الدفعات:</strong> {عدد_الأشهر} أشهر<br>
-    <strong>قيمة القسط الشهري:</strong> {القسط_الشهري}$<br>
-    </div>
-    """, unsafe_allow_html=True)
+# زر الحساب
+if st.button("احسب الأقساط"):
+    if cash_price > 0 and product_name:
+        price_with_increase = round(cash_price * 1.3)
+        down_payment = round(price_with_increase / 3)
+        monthly_installment = round((price_with_increase - down_payment) / 5)
 
-# زر إعادة التعيين
+        st.markdown("### تفاصيل الأقساط الشرعية:")
+        st.markdown(
+            f"""
+            <div style='background-color:#ffcc99; padding:15px; border-radius:10px; color:white; font-size:18px;'>
+            <b>اسم المنتج:</b> {product_name}<br>
+            <b>التصنيف:</b> {category}<br>
+            <b>السعر كاش:</b> {int(cash_price)} دولار<br>
+            <b>السعر بعد الزيادة:</b> {price_with_increase} دولار<br>
+            <b>الدفعة الأولى:</b> {down_payment} دولار<br>
+            <b>عدد الأقساط:</b> 5 دفعات<br>
+            <b>قيمة كل قسط:</b> {monthly_installment} دولار
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.warning("يرجى إدخال اسم المنتج وسعر الكاش بشكل صحيح.")
+
+# زر إعادة تعيين الحقول
 if st.button("إعادة تعيين الحقول"):
-    st.session_state.clear()
-    st.rerun()
+    st.experimental_rerun()
