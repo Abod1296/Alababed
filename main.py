@@ -25,9 +25,9 @@ with col2:
 cash_price = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=1.0)
 
 # زر إعادة تعيين
-if st.button("إعادة تعيين"):
+if st.button("إعادة تعيين الحقول"):
     st.session_state.clear()
-    st.rerun()
+    st.experimental_rerun()
 
 # زر حساب الأقساط
 if st.button("احسب الأقساط") and product_name and cash_price > 0:
