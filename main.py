@@ -1,55 +1,56 @@
 import streamlit as st
-from urllib.parse import quote
 
-st.set_page_config(page_title="متجر العبابيد", layout="centered")
+# إعداد صفحة التطبيق
+st.set_page_config(page_title="متجر العبابيد", page_icon="💰", layout="centered")
 
-# رأس الصفحة
-st.markdown("""
-    <h4 style='text-align: center; color: black;'>مرحباً بك في</h4>
-    <h1 style='text-align: center; color: orange; font-family: "Cairo", sans-serif;'>العبابيد</h1>
-    <p style='text-align: center; color: gray;'>هدفنا ثقتكم</p>
-    <p style='text-align: center; color: #555;'>للتواصل: +963943001296</p>
-    <div style='text-align: center;'>
-        <span style='background-color: #fca311; padding: 6px 12px; border-radius: 5px; color: white; font-weight: bold;'>أقساطنا راحتكم</span>
+# عنوان الصفحة
+st.markdown(
+    """
+    <div style='text-align: center; margin-top: -50px;'>
+        <h4 style='color: black; font-family: sans-serif;'>مرحباً بك في</h4>
+        <h1 style='color: orange; font-family: "Cairo", sans-serif;'>العبابيد</h1>
+        <p style='color: #555;'>هدفنا ثقتكم</p>
     </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True
+)
 
-# إدخال الحقول
-category = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مواد بناء", "أخرى"])
-product_name = st.text_input("اسم المنتج")
-cash_price = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=10.0)
-
-# أعمدة للأزرار
+# إدخال معلومات المنتج
+st.write("")  # مسافة
 col1, col2 = st.columns(2)
-
 with col1:
-    if st.button("احسب الأقساط"):
-        if product_name and cash_price > 0:
-            increased_price = int(cash_price * 1.30)
-            down_payment = round(increased_price / 3)
-            monthly_payment = round((increased_price - down_payment) / 5)
-
-            report = f"""
-            اسم المنتج: {product_name}
-            التصنيف: {category}
-            السعر بعد الزيادة: {increased_price} دولار
-            الدفعة الأولى (ثلث تقريباً): {down_payment} دولار
-            عدد الأقساط: 5 دفعات × {monthly_payment} دولار
-            """
-
-            st.markdown(f"""
-                <div style='background-color: orange; padding: 20px; border-radius: 10px; color: white; font-size: 17px;'>
-                <strong>تفاصيل الأقساط:</strong><br><br>
-                {report.replace('\n', '<br>')}
-                </div>
-            """, unsafe_allow_html=True)
-
-            # زر المشاركة
-            share_link = f"https://wa.me/?text={quote('تفاصيل المنتج:\n' + report)}"
-            st.markdown(f"<a href='{share_link}' target='_blank'><button>مشاركة عبر واتساب</button></a>", unsafe_allow_html=True)
-        else:
-            st.warning("يرجى إدخال اسم المنتج وسعر الكاش.")
-
+    category = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مواد بناء", "أخرى"])
 with col2:
-    if st.button("إعادة تعيين الحقول"):
-        st.experimental_rerun()
+    product_name = st.text_input("اسم المنتج")
+
+cash_price = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=1.0)
+
+# زر إعادة تعيين
+if st.button("إعادة تعيين"):
+    st.session_state.clear()
+    st.rerun()
+
+# زر حساب الأقساط
+if st.button("احسب الأقساط") and product_name and cash_price > 0:
+    increased_price = int(cash_price * 1.3)
+    down_payment = int(increased_price / 3.5)  # تقريباً بين الثلث والربع
+    remaining = increased_price - down_payment
+    monthly = round(remaining / 5)
+
+    with st.container():
+        st.markdown(
+            f"""
+            <div style='background-color: orange; padding: 15px; border-radius: 10px; color: white; font-family: "Cairo", sans-serif;'>
+                <h4 style='margin-bottom: 10px;'>تفاصيل الأقساط:</h4>
+                <p><strong>اسم المنتج:</strong> {product_name}</p>
+                <p><strong>التصنيف:</strong> {category}</p>
+                <p><strong>السعر كاش:</strong> {cash_price:.0f} $</p>
+                <p><strong>السعر بعد الزيادة:</strong> {increased_price} $</p>
+                <p><strong>الدفعة الأولى:</strong> {down_payment} $</p>
+                <p><strong>عدد الدفعات:</strong> 5 أشهر</p>
+                <p><strong>قيمة كل دفعة:</strong> {monthly} $</p>
+                <p style='margin-top: 10px; font-weight: bold;'>اقساطنا راحتكم</p>
+            </div>
+            """, unsafe_allow_html=True
+        )
+else:
+    st.markdown("<br>", unsafe_allow_html=True)
