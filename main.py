@@ -16,7 +16,7 @@ st.markdown(
 )
 
 st.markdown('<p class="main-title">مرحباً بك في</p>', unsafe_allow_html=True)
-st.markdown('<p class="brand">الرفاعي ككك</p>', unsafe_allow_html=True)
+st.markdown('<p class="brand">العبــابيد</p>', unsafe_allow_html=True)
 st.markdown('<p class="tagline">هدفنا ثقتكم</p>', unsafe_allow_html=True)
 
 # إعداد الجلسة
