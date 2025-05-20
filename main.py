@@ -1,7 +1,9 @@
 import streamlit as st
 
+# إعداد الصفحة
 st.set_page_config(page_title="متجر العبابيد للتقسيط", layout="centered")
 
+# تنسيق CSS مخصص
 st.markdown(
     """
     <style>
@@ -15,29 +17,39 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# العنوان الرئيسي
 st.markdown('<p class="main-title">مرحباً بك في</p>', unsafe_allow_html=True)
 st.markdown('<p class="brand">العبــابيد</p>', unsafe_allow_html=True)
 st.markdown('<p class="tagline">هدفنا ثقتكم</p>', unsafe_allow_html=True)
 
-# إعداد الجلسة
-if "category" not in st.session_state: st.session_state["category"] = ""
-if "product_name" not in st.session_state: st.session_state["product_name"] = ""
-if "cash_price" not in st.session_state: st.session_state["cash_price"] = 0.0
+# الجلسة لتخزين البيانات
+if "category" not in st.session_state:
+    st.session_state["category"] = ""
+if "product_name" not in st.session_state:
+    st.session_state["product_name"] = ""
+if "cash_price" not in st.session_state:
+    st.session_state["cash_price"] = 0.0
 
-# إدخال المستخدم
-st.session_state["category"] = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مواد بناء", "أخرى"], index=0, key="category")
-st.session_state["product_name"] = st.text_input("اسم المنتج", key="product_name")
-st.session_state["cash_price"] = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=0.5, format="%.2f", key="cash_price")
+# مدخلات المستخدم
+category = st.selectbox("اختر تصنيف المنتج", ["أجهزة محمولة", "كهربائيات", "مواد بناء", "أخرى"])
+product_name = st.text_input("اسم المنتج")
+cash_price_input = st.number_input("أدخل سعر الكاش (بالدولار)", min_value=0.0, step=0.5, format="%.2f")
 
-# حساب الأقساط
+# تخزين القيم في الجلسة
+st.session_state["category"] = category
+st.session_state["product_name"] = product_name
+st.session_state["cash_price"] = cash_price_input
+
+# زر الحساب
 if st.button("احسب الأقساط"):
     cash_price = st.session_state["cash_price"]
     if cash_price > 0 and st.session_state["product_name"].strip() != "":
         increase = 0.30
         new_price = int(cash_price * (1 + increase))
-        down_payment = int(new_price / 3.5)  # تقريباً بين الثلث والربع
+        down_payment = int(new_price / 3.5)  # بين الثلث والربع
         monthly_installment = int((new_price - down_payment) / 5)
 
+        # عرض النتائج
         st.markdown('<div class="result-box">', unsafe_allow_html=True)
         st.markdown(f"""
         <b>اسم المنتج:</b> {st.session_state["product_name"]}<br>
@@ -49,12 +61,12 @@ if st.button("احسب الأقساط"):
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-# زر إعادة تعيين الحقول
+# زر إعادة التعيين
 if st.button("إعادة تعيين الحقول"):
     st.session_state["category"] = ""
     st.session_state["product_name"] = ""
     st.session_state["cash_price"] = 0.0
-    st.experimental_set_query_params(reset="1")
+    st.experimental_rerun()
 
-# ملصق تسويقي
+# الملصق
 st.markdown('<div class="footer">أقساطنا راحتكم</div>', unsafe_allow_html=True)
